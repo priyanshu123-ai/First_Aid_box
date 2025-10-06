@@ -120,3 +120,24 @@ export const logout = async (req, res) => {
     });
   }
 };
+
+
+export const getCurrentUser = async(req,res) => {
+  try {
+
+    return res.status(201).json({
+      success:true,
+      message:"Current User",
+     userId: req.userId
+
+    })
+    
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+    
+  }
+}
