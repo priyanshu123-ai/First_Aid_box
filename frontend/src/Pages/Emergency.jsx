@@ -5,6 +5,8 @@ import { AlertCircle, MapPin, Phone, Mail, MessageSquare, Check } from "lucide-r
 import { useState } from "react";
 import { toast } from "react-toastify";
 import Navbar from "./Navbar";
+import CardDetails from "./CardDetails";
+import LiveMap from "./LiveMap";
 
 const Emergency = () => {
   const [sosActive, setSosActive] = useState(false);
@@ -93,9 +95,9 @@ const Emergency = () => {
                   variant="emergency"
                   size="xl"
                   onClick={handleSOS}
-                  className="w-full max-w-sm mx-auto text-lg font-bold shadow-glow emergency-pulse"
+                  className="w-full bg-emergency px-4 py-6 text-white max-w-sm mx-auto text-lg font-bold shadow-glow emergency-pulse"
                 >
-                  <AlertCircle className="h-6 w-6" />
+                  <AlertCircle className="h-8 w-8" />
                   ACTIVATE EMERGENCY SOS
                 </Button>
               </div>
@@ -117,17 +119,23 @@ const Emergency = () => {
                     <p className="text-muted-foreground">Your emergency contacts are being notified</p>
                   </div>
 
-                  {location && (
-                    <div className="p-4 bg-background rounded-lg max-w-md mx-auto">
-                      <div className="flex items-center gap-2 justify-center mb-2">
-                        <MapPin className="h-5 w-5 text-emergency" />
-                        <span className="font-semibold">Current Location</span>
-                      </div>
-                      <p className="text-sm text-muted-foreground">
-                        Lat: {location.lat.toFixed(6)}, Lng: {location.lng.toFixed(6)}
-                      </p>
-                    </div>
-                  )}
+                 {location && (
+  <>
+    <div className="p-4 bg-background rounded-lg max-w-md mx-auto">
+      <div className="flex items-center gap-2 justify-center mb-2">
+        <MapPin className="h-5 w-5 text-emergency" />
+        <span className="font-semibold">Current Location</span>
+      </div>
+      <p className="text-sm text-muted-foreground">
+        Lat: {location.lat.toFixed(6)}, Lng: {location.lng.toFixed(6)}
+      </p>
+    </div>
+
+    {/* Live map */}
+   
+  </>
+)}
+
 
                   <div className="space-y-3 max-w-md mx-auto">
                     {["SMS", "Email", "WhatsApp"].map((method) => (
@@ -184,6 +192,13 @@ const Emergency = () => {
           </>
         )}
       </div>
+     <div>
+    {!sosActive && <CardDetails />}
+
+    
+  </div>
+  {location &&  <LiveMap location={location} />}
+
     </div>
   );
 };
