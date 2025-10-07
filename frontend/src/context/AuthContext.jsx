@@ -9,7 +9,7 @@ function AuthProvider({ children }) {
   // ✅ Get current user
   const getStatus = async () => {
     try {
-      const resp = await axios.get("http://localhost:3000/api/v1/current", {
+      const resp = await axios.get("http://localhost:4000/api/v1/current", {
         withCredentials: true,
       });
       setCurrentUser(resp.data);
@@ -22,7 +22,7 @@ function AuthProvider({ children }) {
   // ✅ Logout
   const logout = async () => {
     try {
-      await axios.post("http://localhost:3000/api/v1/logout", {}, { withCredentials: true });
+      await axios.post("http://localhost:4000/api/v1/logout", {}, { withCredentials: true });
       setCurrentUser(null);
     } catch (error) {
       console.log(error);

@@ -7,14 +7,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
-import {
-  Heart,
   Flame,
   Bone,
   AlertTriangle,
@@ -36,6 +30,11 @@ const FirstAid = () => {
 
   const [capturedMedia, setCapturedMedia] = useState({});
   const fileInputRef = useRef(null);
+  const [selectedImage, setSelectedImage] = useState(null);
+
+
+  // Automatic prompts for each guide
+ 
 
   // -------------------- VOICES --------------------
   useEffect(() => {
@@ -93,11 +92,7 @@ const FirstAid = () => {
     }
 
     utterance.rate =
-      selectedLang === "hi-IN"
-        ? 0.9
-        : selectedLang === "ta-IN"
-        ? 0.92
-        : 0.95;
+      selectedLang === "hi-IN" ? 0.9 : selectedLang === "ta-IN" ? 0.92 : 0.95;
     utterance.pitch = selectedLang === "hi-IN" ? 1.1 : 1;
 
     utterance.onend = () => {
@@ -112,9 +107,7 @@ const FirstAid = () => {
 
     window.speechSynthesis.speak(utterance);
     toast.success(
-      `Speaking in ${selectedLang} using ${
-        selectedVoice?.name || "default voice"
-      }`
+      `Speaking in ${selectedLang} using ${selectedVoice?.name || "default voice"}`
     );
   };
 
@@ -122,55 +115,59 @@ const FirstAid = () => {
     v.lang.startsWith(selectedLang.split("-")[0])
   );
 
-  // -------------------- CAPTURE + CLOUDINARY VIDEO --------------------
-  const handlePhotoCapture = async (guideId, event) => {
-    const files = event.target.files;
-    if (!files || files.length === 0) return;
+  // -------------------- PHOTO CAPTURE + VIDEO GENERATION --------------------
+ // State for query & generated video
+const [userQuery, setUserQuery] = useState("");
+const [generatedVideo, setGeneratedVideo] = useState(null);
+const [loadingVideo, setLoadingVideo] = useState(false);
 
-    const file = files[0];
-    const reader = new FileReader();
 
-    reader.onloadend = async () => {
-      const photoUrl = reader.result;
 
-      // Save captured image locally in state
-      setCapturedMedia((prev) => ({
-        ...prev,
-        [guideId]: [...(prev[guideId] || []), { type: "image", url: photoUrl }],
-      }));
-      toast.success("Photo captured successfully!");
+const handleGenerateVideo = async () => {
+  if (!userQuery) return toast.error("Please enter a query");
 
-      // -------------------- CLOUDINARY VIDEO GENERATION --------------------
-      try {
-        toast.info("Generating video from image...");
-        const res = await fetch("http://localhost:3000/api/v2/Image", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ imageUrl: photoUrl }),
-        });
+  try {
+    setLoadingVideo(true);
 
-        const data = await res.json();
+    const res = await fetch("http://localhost:4000/api/v2/Image", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: userQuery }), // send query like in Postman
+    });
 
-        if (data.videoUrl) {
-          setCapturedMedia((prev) => ({
-            ...prev,
-            [guideId]: [
-              ...(prev[guideId] || []),
-              { type: "video", url: data.videoUrl },
-            ],
-          }));
-          toast.success("Video generated successfully!");
-        } else {
-          toast.error("Video generation failed.");
-        }
-      } catch (err) {
-        console.error(err);
-        toast.error("Error generating video.");
-      }
-    };
+    const data = await res.json();
 
-    reader.readAsDataURL(file);
+    if (data.success && data.videoUrl) {
+      setGeneratedVideo(data.videoUrl); // update state
+      toast.success("Video generated successfully!");
+    } else {
+      toast.error(data.message || "Video generation failed");
+    }
+  } catch (err) {
+    console.error(err);
+    toast.error("Error generating video");
+  } finally {
+    setLoadingVideo(false);
+  }
+};
+
+const handlePhotoCapture = (event) => {
+  const files = event.target.files;
+  if (!files || files.length === 0) return;
+
+  const file = files[0];
+  const reader = new FileReader();
+
+  reader.onloadend = () => {
+    const photoUrl = reader.result;
+    setSelectedImage(photoUrl); // Store image for preview
+    toast.success("Photo selected successfully!");
   };
+
+  reader.readAsDataURL(file);
+};
+
+
 
   const removeMedia = (guideId, index) => {
     setCapturedMedia((prev) => ({
@@ -312,7 +309,9 @@ const FirstAid = () => {
                           </div>
                           <div>
                             <CardTitle className="text-2xl">{guide.title}</CardTitle>
-                            <CardDescription>Follow these steps carefully</CardDescription>
+                            <CardDescription>
+                              Follow these steps carefully
+                            </CardDescription>
                           </div>
                         </div>
                         <Button
@@ -325,34 +324,91 @@ const FirstAid = () => {
                           {isPlaying ? "Playing..." : "Voice Guide"}
                         </Button>
                       </div>
+<div className="my-6 p-4 bg-muted rounded-lg">
+  <h3 className="text-lg font-semibold mb-2">Generate Video from Image</h3>
 
-                      {/* Actions */}
-                      <div className="flex gap-2 flex-wrap">
-                        <Button
-                          variant="outline"
-                          onClick={() => fileInputRef.current?.click()}
-                          className="gap-2"
-                        >
-                          <Camera className="h-4 w-4" />
-                          Take Photo
-                        </Button>
-                        <input
-                          ref={fileInputRef}
-                          type="file"
-                          accept="image/*"
-                          capture="environment"
-                          className="hidden"
-                          onChange={(e) => handlePhotoCapture(guide.id, e)}
-                        />
-                        <Button
-                          variant="outline"
-                          onClick={() => downloadPDF(guide.title)}
-                          className="gap-2"
-                        >
-                          <Download className="h-4 w-4" />
-                          Download PDF
-                        </Button>
-                      </div>
+  {/* Image Upload */}
+  <div className="flex gap-2 mb-4">
+    <input
+      type="file"
+      accept="image/*"
+      capture="environment"
+      onChange={handlePhotoCapture}
+      className="border rounded-lg px-4 py-2"
+    />
+  </div>
+
+  {/* Image Preview */}
+  {selectedImage && (
+    <div className="mb-4">
+      <h4 className="font-medium mb-2">Preview</h4>
+      <img
+        src={selectedImage}
+        alt="Selected"
+        className="max-w-full rounded-lg border"
+      />
+    </div>
+  )}
+
+  
+<div className="my-6 p-4 bg-muted rounded-lg">
+  <h3 className="text-lg font-semibold mb-2">Generate Video from Query</h3>
+
+  {/* User Query Input */}
+  <div className="flex gap-2 mb-4">
+    <input
+      type="text"
+      placeholder="Enter your query..."
+      value={userQuery}
+      onChange={(e) => setUserQuery(e.target.value)}
+      className="flex-1 border rounded-lg px-4 py-2 bg-background"
+    />
+    <button
+      onClick={handleGenerateVideo}
+      disabled={loadingVideo || !userQuery}
+      className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 disabled:opacity-50"
+    >
+      {loadingVideo ? "Generating..." : "Generate Video"}
+    </button>
+  </div>
+
+  {/* Generated Video */}
+  {generatedVideo && (
+    <div className="mt-4 aspect-video rounded-lg overflow-hidden bg-black flex items-center justify-center">
+      <video
+        controls
+        autoPlay
+        loop
+        muted
+        className="w-full h-full object-cover"
+      >
+        <source src={generatedVideo} type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+    </div>
+  )}
+</div>
+
+
+  {/* Generated Video */}
+  {generatedVideo && (
+    <div className="mt-4 aspect-video rounded-lg overflow-hidden bg-black flex items-center justify-center">
+      <video
+        controls
+        autoPlay
+        loop
+        muted
+        className="w-full h-full object-cover"
+      >
+        <source src={generatedVideo} type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+    </div>
+  )}
+</div>
+
+
+
                     </div>
                   </CardHeader>
 
@@ -377,8 +433,12 @@ const FirstAid = () => {
                                 <video
                                   controls
                                   className="w-full h-32 object-cover rounded-lg border"
+                                  autoPlay
+                                  loop
+                                  muted
                                 >
                                   <source src={media.url} type="video/mp4" />
+                                  Your browser does not support the video tag.
                                 </video>
                               )}
                               <Button
@@ -413,16 +473,34 @@ const FirstAid = () => {
                       </div>
                     </div>
 
-                    {/* Video Tutorial Placeholder */}
+                    {/* Video Tutorial */}
                     <div>
                       <h4 className="font-semibold mb-3 flex items-center gap-2">
                         <Video className="h-4 w-4" />
                         Video Tutorial
                       </h4>
-                      <div className="aspect-video rounded-lg overflow-hidden bg-muted">
-                        <p className="text-center text-sm p-4">
-                          Upload a photo above to generate a tutorial video.
-                        </p>
+                      <div className="aspect-video rounded-lg overflow-hidden bg-muted flex items-center justify-center">
+                        {capturedMedia[guide.id]?.some((m) => m.type === "video") ? (
+                          capturedMedia[guide.id]
+                            .filter((m) => m.type === "video")
+                            .map((media, idx) => (
+                              <video
+                                key={idx}
+                                controls
+                                className="w-full h-full object-cover"
+                                autoPlay
+                                loop
+                                muted
+                              >
+                                <source src={media.url} type="video/mp4" />
+                                Your browser does not support the video tag.
+                              </video>
+                            ))
+                        ) : (
+                          <p className="text-center text-sm p-4">
+                            Upload a photo above to generate a tutorial video.
+                          </p>
+                        )}
                       </div>
                     </div>
                   </CardContent>

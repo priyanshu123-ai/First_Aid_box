@@ -4,11 +4,10 @@ import { Heart, Menu, X, LogOut } from "lucide-react";
 import { useContext, useState } from "react";
 import { AuthContext } from "@/context/AuthContext";
 
-
 const Navbar = () => {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-const { currentUser, logout } = useContext(AuthContext);
+  const { currentUser, logout } = useContext(AuthContext);
 
   const navLinks = [
     { to: "/", label: "Home" },
@@ -43,7 +42,7 @@ const { currentUser, logout } = useContext(AuthContext);
               </Link>
             ))}
             {currentUser ? (
-              <Button className="bg-emergency text-sm"  onClick={() => logout()}>
+              <Button className="bg-emergency text-sm" onClick={() => logout()}>
                 <LogOut className="h-4 w-4" />
                 Sign Out
               </Button>
@@ -69,7 +68,6 @@ const { currentUser, logout } = useContext(AuthContext);
           </button>
         </div>
 
-        {/* Mobile Navigation */}
         {mobileMenuOpen && (
           <div className="md:hidden mt-4 pb-4 space-y-3 border-t pt-4">
             {navLinks.map((link) => (
@@ -87,10 +85,8 @@ const { currentUser, logout } = useContext(AuthContext);
               </Link>
             ))}
             {currentUser ? (
-              <Button 
-               
-                 
-                className="w-full bg-emergency text-sm" 
+              <Button
+                className="w-full bg-emergency text-sm"
                 onClick={() => {
                   logout();
                   setMobileMenuOpen(false);

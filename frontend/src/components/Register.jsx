@@ -52,7 +52,7 @@ const Register = () => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/v1/login",
+        "http://localhost:4000/api/v1/login",
         {
           email: signInEmail,
           password: signInPassword,
@@ -78,7 +78,7 @@ const Register = () => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/v1/register",
+        "http://localhost:4000/api/v1/register",
         {
           name: signUpName,
           email: signUpEmail,

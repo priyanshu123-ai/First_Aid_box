@@ -1,36 +1,25 @@
-import cloudinary from "cloudinary";
+// backend/controllers/videoController.js
+import axios from "axios";
 import dotenv from "dotenv";
-dotenv.config();
 
-cloudinary.v2.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
+dotenv.config();
 
 export const generateVideoFromImage = async (req, res) => {
   try {
-    const { imageUrl } = req.body;
-    if (!imageUrl) return res.status(400).json({ error: "Image URL required" });
+    const { query } = req.body;
+    if (!query) return res.status(400).json({ success: false, message: "Query is required" });
 
-    // Step 1: Upload image to Cloudinary
-    const uploadResponse = await cloudinary.v2.uploader.upload(imageUrl, {
-      folder: "first-aid-images",
+    const response = await axios.get("https://api.pexels.com/videos/search", {
+      headers: { Authorization: process.env.PEXELS_API_KEY },
+      params: { query, per_page: 1 },
     });
 
-    // Step 2: Generate a looping video from the uploaded image
-    const videoUrl = cloudinary.v2.video(uploadResponse.public_id, {
-      resource_type: "video",
-      transformation: [
-        { width: 720, height: 720, crop: "fill" },
-        { effect: "loop:5" }, // loop 5 seconds
-      ],
-      format: "mp4",
-    });
+    const videoUrl = response.data.videos[0]?.video_files[0]?.link;
+    if (!videoUrl) return res.status(404).json({ success: false, message: "Video not found" });
 
-    res.json({ videoUrl });
-  } catch (err) {
-    console.error("Cloudinary error:", err);
-    res.status(500).json({ error: "Failed to generate video" });
+    res.json({ success: true, videoUrl });
+  } catch (error) {
+    console.error("❌ Error fetching video:", error.message);
+    res.status(500).json({ success: false, message: "Video fetching failed" });
   }
 };
