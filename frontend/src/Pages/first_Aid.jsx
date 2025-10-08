@@ -14,7 +14,6 @@ import {
   AlertTriangle,
   Volume2,
   Camera,
-  Download,
   Video,
   X,
 } from "lucide-react";
@@ -32,9 +31,9 @@ const FirstAid = () => {
   const fileInputRef = useRef(null);
   const [selectedImage, setSelectedImage] = useState(null);
 
-
-  // Automatic prompts for each guide
- 
+  const [userQuery, setUserQuery] = useState("");
+  const [generatedVideo, setGeneratedVideo] = useState(null);
+  const [loadingVideo, setLoadingVideo] = useState(false);
 
   // -------------------- VOICES --------------------
   useEffect(() => {
@@ -116,58 +115,49 @@ const FirstAid = () => {
   );
 
   // -------------------- PHOTO CAPTURE + VIDEO GENERATION --------------------
- // State for query & generated video
-const [userQuery, setUserQuery] = useState("");
-const [generatedVideo, setGeneratedVideo] = useState(null);
-const [loadingVideo, setLoadingVideo] = useState(false);
+  const handleGenerateVideo = async () => {
+    if (!userQuery) return toast.error("Please enter a query");
 
+    try {
+      setLoadingVideo(true);
 
+      const res = await fetch("http://localhost:4000/api/v2/Image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query: userQuery }),
+      });
 
-const handleGenerateVideo = async () => {
-  if (!userQuery) return toast.error("Please enter a query");
+      const data = await res.json();
 
-  try {
-    setLoadingVideo(true);
-
-    const res = await fetch("http://localhost:4000/api/v2/Image", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ query: userQuery }), // send query like in Postman
-    });
-
-    const data = await res.json();
-
-    if (data.success && data.videoUrl) {
-      setGeneratedVideo(data.videoUrl); // update state
-      toast.success("Video generated successfully!");
-    } else {
-      toast.error(data.message || "Video generation failed");
+      if (data.success && data.videoUrl) {
+        setGeneratedVideo(data.videoUrl);
+        toast.success("Video generated successfully!");
+      } else {
+        toast.error(data.message || "Video generation failed");
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error("Error generating video");
+    } finally {
+      setLoadingVideo(false);
     }
-  } catch (err) {
-    console.error(err);
-    toast.error("Error generating video");
-  } finally {
-    setLoadingVideo(false);
-  }
-};
-
-const handlePhotoCapture = (event) => {
-  const files = event.target.files;
-  if (!files || files.length === 0) return;
-
-  const file = files[0];
-  const reader = new FileReader();
-
-  reader.onloadend = () => {
-    const photoUrl = reader.result;
-    setSelectedImage(photoUrl); // Store image for preview
-    toast.success("Photo selected successfully!");
   };
 
-  reader.readAsDataURL(file);
-};
+  const handlePhotoCapture = (event) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
 
+    const file = files[0];
+    const reader = new FileReader();
 
+    reader.onloadend = () => {
+      const photoUrl = reader.result;
+      setSelectedImage(photoUrl);
+      toast.success("Photo selected successfully!");
+    };
+
+    reader.readAsDataURL(file);
+  };
 
   const removeMedia = (guideId, index) => {
     setCapturedMedia((prev) => ({
@@ -177,11 +167,6 @@ const handlePhotoCapture = (event) => {
     toast.info("Removed media");
   };
 
-  const downloadPDF = (guideTitle) => {
-    toast.success(`Downloading ${guideTitle} PDF guide...`);
-  };
-
-  // -------------------- FIRST AID DATA --------------------
   const firstAidGuides = [
     {
       id: "burns",
@@ -225,19 +210,20 @@ const handlePhotoCapture = (event) => {
 
   // -------------------- UI --------------------
   return (
-    <div className="min-h-screen bg-gradient-subtle py-12">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">First-Aid Guide</h1>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+    <div className="min-h-screen bg-gradient-subtle py-8 px-4">
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-8 px-4">
+          <h1 className="text-3xl md:text-5xl font-bold mb-2">First-Aid Guide</h1>
+          <p className="text-sm md:text-lg text-muted-foreground max-w-2xl mx-auto">
             Step-by-step emergency instructions with multilingual voice guidance.
           </p>
         </div>
 
-        {/* Language & Voice */}
-        <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
-          <div>
-            <label className="block text-sm font-medium mb-2">Language</label>
+        {/* Language + Voice Selector */}
+        <div className="flex flex-col sm:flex-row gap-4 mb-8 justify-center items-center">
+          <div className="flex flex-col">
+            <label className="text-sm font-medium mb-1">Language</label>
             <select
               className="border rounded-lg px-4 py-2 bg-background"
               value={selectedLang}
@@ -254,8 +240,9 @@ const handlePhotoCapture = (event) => {
               <option value="es-ES">Spanish</option>
             </select>
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-2">Voice</label>
+
+          <div className="flex flex-col">
+            <label className="text-sm font-medium mb-1">Voice</label>
             <select
               className="border rounded-lg px-4 py-2 bg-background min-w-[200px]"
               value={selectedVoice?.name || ""}
@@ -278,18 +265,18 @@ const handlePhotoCapture = (event) => {
         </div>
 
         {/* Tabs */}
-        <Tabs defaultValue="burns" className="space-y-8">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4 gap-2 bg-transparent">
+        <Tabs defaultValue="burns" className="space-y-6">
+          <TabsList className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
             {firstAidGuides.map((guide) => {
               const Icon = guide.icon;
               return (
                 <TabsTrigger
                   key={guide.id}
                   value={guide.id}
-                  className="flex flex-col items-center gap-2 p-4 data-[state=active]:bg-card data-[state=active]:shadow-card"
+                  className="flex flex-col items-center gap-1 p-3 data-[state=active]:bg-card data-[state=active]:shadow-card rounded-lg"
                 >
                   <Icon className={`h-6 w-6 ${guide.color}`} />
-                  <span className="text-sm font-medium">{guide.title}</span>
+                  <span className="text-xs sm:text-sm font-medium">{guide.title}</span>
                 </TabsTrigger>
               );
             })}
@@ -300,162 +287,93 @@ const handlePhotoCapture = (event) => {
             return (
               <TabsContent key={guide.id} value={guide.id}>
                 <Card className="shadow-card">
-                  <CardHeader>
-                    <div className="flex flex-col gap-4">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-3">
-                          <div className="p-3 rounded-lg bg-muted">
-                            <Icon className={`h-8 w-8 ${guide.color}`} />
-                          </div>
-                          <div>
-                            <CardTitle className="text-2xl">{guide.title}</CardTitle>
-                            <CardDescription>
-                              Follow these steps carefully
-                            </CardDescription>
-                          </div>
+                  <CardHeader className="flex flex-col gap-4">
+                    {/* Header Section */}
+                    <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+                      <div className="flex items-center gap-3">
+                        <div className="p-3 rounded-lg bg-muted">
+                          <Icon className={`h-8 w-8 ${guide.color}`} />
                         </div>
-                        <Button
-                          variant="medical"
-                          size="lg"
-                          onClick={() => handleVoiceGuidance(guide.title, guide.steps)}
-                          disabled={isPlaying}
-                        >
-                          <Volume2 className="h-5 w-5" />
-                          {isPlaying ? "Playing..." : "Voice Guide"}
-                        </Button>
+                        <div>
+                          <CardTitle className="text-xl sm:text-2xl">{guide.title}</CardTitle>
+                          <CardDescription>
+                            Follow these steps carefully
+                          </CardDescription>
+                        </div>
                       </div>
-<div className="my-6 p-4 bg-muted rounded-lg">
-  <h3 className="text-lg font-semibold mb-2">Generate Video from Image</h3>
+                      <Button
+                        variant="medical"
+                        size="lg"
+                        onClick={() => handleVoiceGuidance(guide.title, guide.steps)}
+                        disabled={isPlaying}
+                      >
+                        <Volume2 className="h-5 w-5" />
+                        {isPlaying ? "Playing..." : "Voice Guide"}
+                      </Button>
+                    </div>
 
-  {/* Image Upload */}
-  <div className="flex gap-2 mb-4">
-    <input
-      type="file"
-      accept="image/*"
-      capture="environment"
-      onChange={handlePhotoCapture}
-      className="border rounded-lg px-4 py-2"
-    />
-  </div>
+                    {/* Image Upload */}
+                    <div className="bg-muted p-4 rounded-lg flex flex-col gap-4">
+                      <h3 className="font-semibold text-lg">Generate Video from Image</h3>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        capture="environment"
+                        onChange={handlePhotoCapture}
+                        className="border rounded-lg px-4 py-2"
+                      />
 
-  {/* Image Preview */}
-  {selectedImage && (
-    <div className="mb-4">
-      <h4 className="font-medium mb-2">Preview</h4>
-      <img
-        src={selectedImage}
-        alt="Selected"
-        className="max-w-full rounded-lg border"
-      />
-    </div>
-  )}
+                      {selectedImage && (
+                        <div className="flex flex-col gap-2">
+                          <h4 className="font-medium">Preview</h4>
+                          <img
+                            src={selectedImage}
+                            alt="Selected"
+                            className="max-w-full rounded-lg border"
+                          />
+                        </div>
+                      )}
+                    </div>
 
-  
-<div className="my-6 p-4 bg-muted rounded-lg">
-  <h3 className="text-lg font-semibold mb-2">Generate Video from Query</h3>
+                    {/* Query Video */}
+                    <div className="bg-muted p-4 rounded-lg flex flex-col gap-4">
+                      <h3 className="font-semibold text-lg">Generate Video from Query</h3>
+                      <div className="flex flex-col sm:flex-row gap-2">
+                        <input
+                          type="text"
+                          placeholder="Enter your query..."
+                          value={userQuery}
+                          onChange={(e) => setUserQuery(e.target.value)}
+                          className="flex-1 border rounded-lg px-4 py-2 bg-background"
+                        />
+                        <button
+                          onClick={handleGenerateVideo}
+                          disabled={loadingVideo || !userQuery}
+                          className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 disabled:opacity-50"
+                        >
+                          {loadingVideo ? "Generating..." : "Generate Video"}
+                        </button>
+                      </div>
 
-  {/* User Query Input */}
-  <div className="flex gap-2 mb-4">
-    <input
-      type="text"
-      placeholder="Enter your query..."
-      value={userQuery}
-      onChange={(e) => setUserQuery(e.target.value)}
-      className="flex-1 border rounded-lg px-4 py-2 bg-background"
-    />
-    <button
-      onClick={handleGenerateVideo}
-      disabled={loadingVideo || !userQuery}
-      className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 disabled:opacity-50"
-    >
-      {loadingVideo ? "Generating..." : "Generate Video"}
-    </button>
-  </div>
-
-  {/* Generated Video */}
-  {generatedVideo && (
-    <div className="mt-4 aspect-video rounded-lg overflow-hidden bg-black flex items-center justify-center">
-      <video
-        controls
-        autoPlay
-        loop
-        muted
-        className="w-full h-full object-cover"
-      >
-        <source src={generatedVideo} type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
-    </div>
-  )}
-</div>
-
-
-  {/* Generated Video */}
-  {generatedVideo && (
-    <div className="mt-4 aspect-video rounded-lg overflow-hidden bg-black flex items-center justify-center">
-      <video
-        controls
-        autoPlay
-        loop
-        muted
-        className="w-full h-full object-cover"
-      >
-        <source src={generatedVideo} type="video/mp4" />
-        Your browser does not support the video tag.
-      </video>
-    </div>
-  )}
-</div>
-
-
-
+                      {generatedVideo && (
+                        <div className="mt-4 aspect-video rounded-lg overflow-hidden bg-black flex items-center justify-center">
+                          <video
+                            controls
+                            autoPlay
+                            loop
+                            muted
+                            className="w-full h-full object-cover"
+                          >
+                            <source src={generatedVideo} type="video/mp4" />
+                            Your browser does not support the video tag.
+                          </video>
+                        </div>
+                      )}
                     </div>
                   </CardHeader>
 
+                  {/* Steps */}
                   <CardContent className="space-y-6">
-                    {/* Media */}
-                    {capturedMedia[guide.id]?.length > 0 && (
-                      <div>
-                        <h4 className="font-semibold mb-3 flex items-center gap-2">
-                          <Camera className="h-4 w-4" />
-                          Captured Media
-                        </h4>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                          {capturedMedia[guide.id].map((media, idx) => (
-                            <div key={idx} className="relative group">
-                              {media.type === "image" ? (
-                                <img
-                                  src={media.url}
-                                  alt={`Captured ${idx + 1}`}
-                                  className="w-full h-32 object-cover rounded-lg border"
-                                />
-                              ) : (
-                                <video
-                                  controls
-                                  className="w-full h-32 object-cover rounded-lg border"
-                                  autoPlay
-                                  loop
-                                  muted
-                                >
-                                  <source src={media.url} type="video/mp4" />
-                                  Your browser does not support the video tag.
-                                </video>
-                              )}
-                              <Button
-                                size="sm"
-                                variant="destructive"
-                                className="absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                                onClick={() => removeMedia(guide.id, idx)}
-                              >
-                                <X className="h-3 w-3" />
-                              </Button>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Steps */}
                     <div>
                       <h4 className="font-semibold mb-3">Step-by-Step Instructions</h4>
                       <div className="space-y-4">
@@ -473,36 +391,43 @@ const handlePhotoCapture = (event) => {
                       </div>
                     </div>
 
-                    {/* Video Tutorial */}
-                    <div>
-                      <h4 className="font-semibold mb-3 flex items-center gap-2">
-                        <Video className="h-4 w-4" />
-                        Video Tutorial
-                      </h4>
-                      <div className="aspect-video rounded-lg overflow-hidden bg-muted flex items-center justify-center">
-                        {capturedMedia[guide.id]?.some((m) => m.type === "video") ? (
-                          capturedMedia[guide.id]
-                            .filter((m) => m.type === "video")
-                            .map((media, idx) => (
-                              <video
-                                key={idx}
-                                controls
-                                className="w-full h-full object-cover"
-                                autoPlay
-                                loop
-                                muted
+                    {/* Captured Media */}
+                    {capturedMedia[guide.id]?.length > 0 && (
+                      <div>
+                        <h4 className="font-semibold mb-3 flex items-center gap-2">
+                          <Camera className="h-4 w-4" />
+                          Captured Media
+                        </h4>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                          {capturedMedia[guide.id].map((media, idx) => (
+                            <div key={idx} className="relative group">
+                              {media.type === "image" ? (
+                                <img
+                                  src={media.url}
+                                  alt={`Captured ${idx + 1}`}
+                                  className="w-full h-32 object-cover rounded-lg border"
+                                />
+                              ) : (
+                                <video
+                                  controls
+                                  className="w-full h-32 object-cover rounded-lg border"
+                                >
+                                  <source src={media.url} type="video/mp4" />
+                                </video>
+                              )}
+                              <Button
+                                size="sm"
+                                variant="destructive"
+                                className="absolute top-1 right-1 h-6 w-6 p-0 opacity-0 group-hover:opacity-100"
+                                onClick={() => removeMedia(guide.id, idx)}
                               >
-                                <source src={media.url} type="video/mp4" />
-                                Your browser does not support the video tag.
-                              </video>
-                            ))
-                        ) : (
-                          <p className="text-center text-sm p-4">
-                            Upload a photo above to generate a tutorial video.
-                          </p>
-                        )}
+                                <X className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
                       </div>
-                    </div>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>

@@ -60,6 +60,7 @@ const Emergency = () => {
 
           // Now send SOS email
           await handleEmergency(coords);
+          await sendWhatsAppMessage(coords);
 
           setAlertsSent(["SMS", "Email", "WhatsApp"]);
           toast.success("📍 SOS alert and location sent successfully!");
@@ -83,6 +84,30 @@ const Emergency = () => {
     setNearestHospitals([]);
     toast.info("Emergency alert cancelled");
   };
+
+  const sendWhatsAppMessage = (coords) => {
+    if (!detail || !detail.contactDetails || detail.contactDetails.length === 0) {
+      toast.error("No contact details available to send");
+      return;
+    }
+
+    const contact = detail.contactDetails[0]; // first contact
+    const phoneNumber = contact.phoneNumber.replace(/\+/g, "").trim();
+
+    const message = `
+🚨 *EMERGENCY ALERT* 🚨
+Name: ${detail.FullName}
+Relation: ${contact.relation || "N/A"}
+Phone: ${contact.phoneNumber}
+Location: https://www.google.com/maps?q=${coords.lat},${coords.lng}
+    `;
+
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappURL = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+
+    window.open(whatsappURL, "_blank"); // opens WhatsApp
+  };
+
 
  const handleEmergency = async (coords) => {
   try {
