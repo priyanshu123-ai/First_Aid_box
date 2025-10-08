@@ -131,10 +131,10 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 py-12">
+    <div className="min-h-screen bg-gradient-to-br overflow-x-hidden py-12">
    
       <form onSubmit={handleSaveProfile}>
-        <div className="container mx-auto px-4 max-w-4xl">
+        <div className="container mx-auto px-4 max-w-4xl ">
           {/* Header */}
           <div className="text-center mb-12">
             <h1 className="text-4xl md:text-5xl font-bold mb-4">
@@ -435,35 +435,7 @@ const Profile = () => {
           </div>
 
           {/* PDF Preview */}
-          <div
-            id="profileCardPreview"
-            className="mt-10 p-6 border rounded-xl bg-white shadow-md max-w-md mx-auto"
-          >
-            <h2 className="text-xl font-bold mb-2 text-blue-600">
-              Medical Profile Card
-            </h2>
-            <p>
-              <strong>Name:</strong> {form.FullName}
-            </p>
-            <p>
-              <strong>DOB:</strong> {form.DateOfBirth}
-            </p>
-            <p>
-              <strong>Blood Group:</strong> {form.bloodGroup}
-            </p>
-            <p>
-              <strong>Phone:</strong> {form.phone}
-            </p>
-            <p>
-              <strong>Allergies:</strong> {form.Allergies}
-            </p>
-            <h3 className="mt-3 font-semibold">Emergency Contacts</h3>
-            {emergencyContacts.map((c, i) => (
-              <p key={i}>
-                {c.name} ({c.relation}): {c.phoneNumber}
-              </p>
-            ))}
-          </div>
+ 
         </div>
       </form>
     </div>

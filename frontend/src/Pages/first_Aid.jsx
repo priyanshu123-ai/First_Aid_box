@@ -106,7 +106,9 @@ const FirstAid = () => {
 
     window.speechSynthesis.speak(utterance);
     toast.success(
-      `Speaking in ${selectedLang} using ${selectedVoice?.name || "default voice"}`
+      `Speaking in ${selectedLang} using ${
+        selectedVoice?.name || "default voice"
+      }`
     );
   };
 
@@ -214,9 +216,12 @@ const FirstAid = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8 px-4">
-          <h1 className="text-3xl md:text-5xl font-bold mb-2">First-Aid Guide</h1>
+          <h1 className="text-3xl md:text-5xl font-bold mb-2">
+            First-Aid Guide
+          </h1>
           <p className="text-sm md:text-lg text-muted-foreground max-w-2xl mx-auto">
-            Step-by-step emergency instructions with multilingual voice guidance.
+            Step-by-step emergency instructions with multilingual voice
+            guidance.
           </p>
         </div>
 
@@ -244,7 +249,7 @@ const FirstAid = () => {
           <div className="flex flex-col">
             <label className="text-sm font-medium mb-1">Voice</label>
             <select
-              className="border rounded-lg px-4 py-2 bg-background min-w-[200px]"
+              className="border rounded-lg px-4 py-2 bg-background w-36"
               value={selectedVoice?.name || ""}
               onChange={(e) => {
                 const voice = voices.find((v) => v.name === e.target.value);
@@ -266,21 +271,25 @@ const FirstAid = () => {
 
         {/* Tabs */}
         <Tabs defaultValue="burns" className="space-y-6">
-          <TabsList className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
-            {firstAidGuides.map((guide) => {
-              const Icon = guide.icon;
-              return (
-                <TabsTrigger
-                  key={guide.id}
-                  value={guide.id}
-                  className="flex flex-col items-center gap-1 p-3 data-[state=active]:bg-card data-[state=active]:shadow-card rounded-lg"
-                >
-                  <Icon className={`h-6 w-6 ${guide.color}`} />
-                  <span className="text-xs sm:text-sm font-medium">{guide.title}</span>
-                </TabsTrigger>
-              );
-            })}
-          </TabsList>
+          <div className=" ">
+            <TabsList className="grid bg-white w-screen grid-cols-3 md:m-14 mb-14 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+              {firstAidGuides.map((guide) => {
+                const Icon = guide.icon;
+                return (
+                  <TabsTrigger
+                    key={guide.id}
+                    value={guide.id}
+                    className="flex flex-col  items-center gap-1 p-3 data-[state=active]:bg-card data-[state=active]:shadow-card rounded-lg"
+                  >
+                    <Icon className={`h-6 w-6 ${guide.color}`} />
+                    <span className="text-xs sm:text-sm font-medium">
+                      {guide.title}
+                    </span>
+                  </TabsTrigger>
+                );
+              })}
+            </TabsList>
+          </div>
 
           {firstAidGuides.map((guide) => {
             const Icon = guide.icon;
@@ -295,7 +304,9 @@ const FirstAid = () => {
                           <Icon className={`h-8 w-8 ${guide.color}`} />
                         </div>
                         <div>
-                          <CardTitle className="text-xl sm:text-2xl">{guide.title}</CardTitle>
+                          <CardTitle className="text-xl sm:text-2xl">
+                            {guide.title}
+                          </CardTitle>
                           <CardDescription>
                             Follow these steps carefully
                           </CardDescription>
@@ -304,7 +315,9 @@ const FirstAid = () => {
                       <Button
                         variant="medical"
                         size="lg"
-                        onClick={() => handleVoiceGuidance(guide.title, guide.steps)}
+                        onClick={() =>
+                          handleVoiceGuidance(guide.title, guide.steps)
+                        }
                         disabled={isPlaying}
                       >
                         <Volume2 className="h-5 w-5" />
@@ -314,7 +327,9 @@ const FirstAid = () => {
 
                     {/* Image Upload */}
                     <div className="bg-muted p-4 rounded-lg flex flex-col gap-4">
-                      <h3 className="font-semibold text-lg">Generate Video from Image</h3>
+                      <h3 className="font-semibold text-lg">
+                        Generate Video from Image
+                      </h3>
                       <input
                         type="file"
                         accept="image/*"
@@ -337,7 +352,9 @@ const FirstAid = () => {
 
                     {/* Query Video */}
                     <div className="bg-muted p-4 rounded-lg flex flex-col gap-4">
-                      <h3 className="font-semibold text-lg">Generate Video from Query</h3>
+                      <h3 className="font-semibold text-lg">
+                        Generate Video from Query
+                      </h3>
                       <div className="flex flex-col sm:flex-row gap-2">
                         <input
                           type="text"
@@ -375,7 +392,9 @@ const FirstAid = () => {
                   {/* Steps */}
                   <CardContent className="space-y-6">
                     <div>
-                      <h4 className="font-semibold mb-3">Step-by-Step Instructions</h4>
+                      <h4 className="font-semibold mb-3">
+                        Step-by-Step Instructions
+                      </h4>
                       <div className="space-y-4">
                         {guide.steps.map((step, index) => (
                           <div
@@ -385,7 +404,9 @@ const FirstAid = () => {
                             <div className="shrink-0 w-8 h-8 rounded-full bg-emergency text-emergency-foreground flex items-center justify-center font-bold">
                               {index + 1}
                             </div>
-                            <p className="text-sm leading-relaxed pt-1">{step}</p>
+                            <p className="text-sm leading-relaxed pt-1">
+                              {step}
+                            </p>
                           </div>
                         ))}
                       </div>
