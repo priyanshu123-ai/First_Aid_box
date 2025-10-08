@@ -1,9 +1,21 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import { 
-  Heart, Phone, MapPin, BookOpen, Shield, Clock, 
-  AlertCircle, FileText 
+import {
+  Heart,
+  Phone,
+  MapPin,
+  BookOpen,
+  Shield,
+  Clock,
+  AlertCircle,
+  FileText,
 } from "lucide-react";
 import heroImage from "@/assets/hero-medical.jpg";
 import Navbar from "./Navbar";
@@ -12,226 +24,268 @@ import firstAidIcon from "@/assets/first-aid-icon.png";
 import sosIcon from "@/assets/sos-icon.png";
 import hospitalIcon from "@/assets/hospital-icon.png";
 
-
- // ✅ use new Header
+// ✅ use new Header
 
 const Home = () => {
   return (
     <div className="min-h-screen  flex flex-col">
       {/* Navbar/Header */}
-      <Navbar />
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden flex-grow">
-        <div 
-          className="absolute inset-0 bg-cover bg-center opacity-20"
+      <section className="relative overflow-hidden flex-grow min-h-[600px]">
+        {/* Background image with smooth overlay */}
+        <div
+          className="absolute inset-0 bg-cover bg-center filter brightness-75"
           style={{ backgroundImage: `url(${heroImage})` }}
+          aria-hidden="true"
         />
-        <div className="absolute inset-0 bg-gradient-hero opacity-90" />
-        
-        <div className="relative container mx-auto px-4 py-24 md:py-32">
-          <div className="max-w-3xl mx-auto text-center space-y-6">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-background/20 backdrop-blur-sm rounded-full border border-white/30">
-              <Heart className="h-4 w-4 text-white" fill="currentColor" />
-              <span className="text-sm text-white font-medium">One Click to Save a Life</span>
-            </div>
-            
-            <h1 className="text-4xl md:text-6xl font-bold text-white leading-tight">
-              Emergency First-Aid & Nearest Help
-            </h1>
-            
-            <p className="text-lg md:text-xl text-white/90 max-w-2xl mx-auto">
-              Get instant first-aid guidance, send emergency alerts, and find nearby hospitals. 
-              Every second counts in an emergency.
-            </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-              <Link to="/emergency">
-                <Button  size="xl" className="bg-emergency py-5 px-8 text-xl w-full rounded-lg hover:bg-emergency-hover sm:w-auto shadow-glow emergency-pulse">
-                  <AlertCircle className="h-5 w-5" />
-                  Emergency SOS
-                </Button>
-              </Link>
-              <Link to="/first-aid">
-                <Button variant="outline" size="xl" className="w-full py-5 px-8 text-xl sm:w-auto bg-white hover:bg-white/90 text-foreground border-white">
-                  <BookOpen className="h-5 w-5" />
-                  First Aid Guide
-                </Button>
-              </Link>
-            </div>
-            
-            <div className="pt-4">
-              <Link to="/auth">
-                <Button variant="ghost" className="text-white hover:text-white/90 hover:bg-white/10">
-                  Sign in to save your medical profile →
-                </Button>
-              </Link>
-            </div>
+        {/* Gradient overlay for contrast */}
+        <div
+          className="absolute inset-0 bg-gradient-to-br from-black/90 via-black/50 to-transparent"
+          aria-hidden="true"
+        />
+
+        {/* Content container */}
+        <div className="relative container mx-auto px-6 py-24 md:py-32 flex flex-col justify-center min-h-[600px] max-w-4xl text-center">
+          {/* Highlight badge */}
+          <div className="inline-flex items-center gap-2 px-5 py-2 bg-white/20 backdrop-blur-sm rounded-full border border-white/30 self-center mb-6 shadow-lg">
+            <Heart className="h-5 w-5 text-white" fill="currentColor" />
+            <span className="text-sm font-semibold text-white uppercase tracking-wide drop-shadow-lg">
+              One Click to Save a Life
+            </span>
+          </div>
+
+          {/* Main heading */}
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold leading-tight text-white drop-shadow-xl mb-6">
+            Emergency First-Aid & Nearest Help
+          </h1>
+
+          {/* Description text */}
+          <p className="text-base sm:text-lg md:text-xl text-white/90 max-w-3xl mx-auto drop-shadow-md mb-10">
+            Get instant first-aid guidance, send emergency alerts, and find
+            nearby hospitals. Every second counts in an emergency.
+          </p>
+
+          {/* Primary action buttons group */}
+          <div className="flex flex-col sm:flex-row gap-5 justify-center max-w-md mx-auto sm:max-w-none">
+            <Link to="/emergency" className="w-full sm:w-auto">
+              <Button
+                size="xl"
+                className="bg-emergency py-5 px-10 text-xl rounded-xl hover:bg-emergency-hover shadow-lg shadow-emergency/50 transition duration-300 flex items-center justify-center gap-3 emergency-pulse"
+              >
+                <AlertCircle className="h-6 w-6" />
+                Emergency SOS
+              </Button>
+            </Link>
+            <Link to="/first-aid" className="w-full sm:w-auto">
+              <Button
+                variant="outline"
+                size="xl"
+                className="px-10 py-5 text-xl rounded-xl border-white border-2 text-red-700 transition duration-300 flex items-center justify-center gap-3"
+              >
+                <BookOpen className="h-6 w-6" />
+                First Aid Guide
+              </Button>
+            </Link>
+          </div>
+
+          {/* Secondary action */}
+          <div className="mt-8">
+            <Link to="/auth" className="inline-block">
+              <Button
+                variant="ghost"
+                className="text-white hover:text-white/90 hover:bg-white/10 text-sm md:text-lg transition"
+              >
+                Sign in to save your medical profile →
+              </Button>
+            </Link>
           </div>
         </div>
       </section>
 
-    <section className="w-full py-20 bg-gradient-subtle">
-        <div className="w-full container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+      <section className="w-full py-24 bg-white">
+        <div className="container mx-auto px-6 max-w-7xl">
+          {/* Section heading */}
+          <div className="max-w-3xl mx-auto mb-16 text-center">
+            <h2 className="text-4xl font-bold text-gray-900 mb-3 leading-tight">
               Life-Saving Features at Your Fingertips
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Comprehensive emergency assistance designed to help you act quickly and confidently in critical situations
+            <p className="text-lg text-gray-600 leading-relaxed">
+              Comprehensive emergency assistance designed to help you act
+              quickly and confidently in critical situations.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto">
-            {/* First Aid Guide Card */}
-            <Card className="shadow-card hover:shadow-emergency transition-all duration-300 border-2 hover:border-emergency/50">
-              <CardHeader>
-                <div className="mb-4">
-                  <img 
-                    src={firstAidIcon} 
-                    alt="First Aid" 
-                    className="h-16 w-16 mx-auto"
-                  />
-                </div>
-                <CardTitle className="text-2xl text-center">First-Aid Guide</CardTitle>
-                <CardDescription className="text-center">
-                  Step-by-step instructions with voice guidance
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3 mb-6">
-                  <li className="flex items-start gap-2">
-                    <Heart className="h-5 w-5 text-emergency shrink-0 mt-0.5" />
-                    <span className="text-sm">CPR & heart attack response</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Shield className="h-5 w-5 text-medical shrink-0 mt-0.5" />
-                    <span className="text-sm">Burns & wound treatment</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <BookOpen className="h-5 w-5 text-success shrink-0 mt-0.5" />
-                    <span className="text-sm">Fractures & injuries</span>
-                  </li>
-                </ul>
-                <Link to="/first-aid">
-                  <Button variant="medical" className="w-full bg-medical">
-                    View Guide
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            {/* Card 1 - First Aid Guide */}
+            <div className="p-8 hover:scale-105 duration-700 transition-all  border rounded-xl shadow-lg flex flex-col items-center bg-gradient-to-tr from-white to-blue-50">
+              <div className="inline-flex items-center justify-center rounded-full bg-blue-100 h-20 w-20 mb-6">
+                <img src={firstAidIcon} alt="First Aid" className="h-12 w-12" />
+              </div>
+              <h3 className="text-2xl font-semibold text-gray-900 mb-2">
+                First-Aid Guide
+              </h3>
+              <p className="text-gray-700 mb-6 text-center max-w-xs">
+                Step-by-step instructions with voice guidance for urgent
+                situations.
+              </p>
+              <ul className="mb-8 space-y-3 w-full text-gray-700 text-sm">
+                <li className="flex items-center gap-3">
+                  <Heart className="h-5 w-5 text-blue-600" /> CPR & heart attack
+                  response
+                </li>
+                <li className="flex items-center gap-3">
+                  <Shield className="h-5 w-5 text-teal-600" /> Burns & wound
+                  treatment
+                </li>
+                <li className="flex items-center gap-3">
+                  <BookOpen className="h-5 w-5 text-green-600" /> Fractures &
+                  injuries
+                </li>
+              </ul>
+              <Link to="/first-aid" className="w-full">
+                <button
+                  type="button"
+                  className="w-full py-3 text-lg font-semibold text-white bg-blue-700 rounded-lg transition-transform duration-300  hover:bg-blue-600"
+                >
+                  View Guide
+                </button>
+              </Link>
+            </div>
 
-            {/* SOS Emergency Card */}
-            <Card className="shadow-card hover:shadow-emergency transition-all duration-300 border-2 hover:border-emergency/50 ring-2 ring-emergency/20">
-              <CardHeader>
-                <div className="mb-4">
-                  <img 
-                    src={sosIcon} 
-                    alt="Emergency SOS" 
-                    className="h-16 w-16 mx-auto"
-                  />
-                </div>
-                <CardTitle className="text-2xl text-center">Emergency SOS</CardTitle>
-                <CardDescription className="text-center">
-                  One-click emergency alerts
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3 mb-6">
-                  <li className="flex items-start gap-2">
-                    <Phone className="h-5 w-5 text-emergency shrink-0 mt-0.5" />
-                    <span className="text-sm">Alert emergency contacts instantly</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <MapPin className="h-5 w-5 text-medical shrink-0 mt-0.5" />
-                    <span className="text-sm">Share live location automatically</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Clock className="h-5 w-5 text-success shrink-0 mt-0.5" />
-                    <span className="text-sm">Fastest response time</span>
-                  </li>
-                </ul>
-                <Link to="/emergency">
-                  <Button variant="emergency" className="w-full bg-emergency-hover ">
-                    Activate SOS
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+            {/* Card 2 - Emergency SOS */}
+            <div className="p-8 hover:scale-105 duration-700 transition-all  border rounded-xl shadow-lg flex flex-col items-center bg-gradient-to-tr from-white to-red-50">
+              <div className="inline-flex items-center justify-center rounded-full bg-red-100 h-20 w-20 mb-6">
+                <img src={sosIcon} alt="Emergency SOS" className="h-12 w-12" />
+              </div>
+              <h3 className="text-2xl font-semibold text-gray-900 mb-2">
+                Emergency SOS
+              </h3>
+              <p className="text-gray-700 mb-6 text-center max-w-xs">
+                One-click emergency alerts to notify contacts & share location.
+              </p>
+              <ul className="mb-8 space-y-3 w-full text-gray-700 text-sm">
+                <li className="flex items-center gap-3">
+                  <Phone className="h-5 w-5 text-red-600" /> Alert emergency
+                  contacts instantly
+                </li>
+                <li className="flex items-center gap-3">
+                  <MapPin className="h-5 w-5 text-pink-600" /> Share live
+                  location automatically
+                </li>
+                <li className="flex items-center gap-3">
+                  <Clock className="h-5 w-5 text-rose-600" /> Fastest response
+                  time
+                </li>
+              </ul>
+              <Link to="/emergency" className="w-full">
+                <button
+                  type="button"
+                  className="w-full py-3 text-lg font-semibold text-white bg-red-700 rounded-lg transition-transform duration-300 hover:bg-red-600"
+                >
+                  Activate SOS
+                </button>
+              </Link>
+            </div>
 
-            {/* Hospital Locator Card */}
-            <Card className="shadow-card hover:shadow-emergency transition-all duration-300 border-2 hover:border-emergency/50">
-              <CardHeader>
-                <div className="mb-4">
-                  <img 
-                    src={hospitalIcon} 
-                    alt="Hospital Locator" 
-                    className="h-16 w-16 mx-auto"
-                  />
-                </div>
-                <CardTitle className="text-2xl text-center">Hospital Locator</CardTitle>
-                <CardDescription className="text-center">
-                  Find nearest medical facilities
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3 mb-6">
-                  <li className="flex items-start gap-2">
-                    <MapPin className="h-5 w-5 text-emergency shrink-0 mt-0.5" />
-                    <span className="text-sm">Nearby hospitals & clinics</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Phone className="h-5 w-5 text-medical shrink-0 mt-0.5" />
-                    <span className="text-sm">Direct contact information</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <Clock className="h-5 w-5 text-success shrink-0 mt-0.5" />
-                    <span className="text-sm">Real-time availability</span>
-                  </li>
-                </ul>
-                <Link to="/hospitals">
-                  <Button variant="medical" className="w-full bg-medical">
-                    Find Hospitals
-                  </Button>
-                </Link>
-              </CardContent>
-            </Card>
+            {/* Card 3 - Hospital Locator */}
+            <div className="p-8 hover:scale-105 duration-700 transition-all  border rounded-xl shadow-lg flex flex-col items-center bg-gradient-to-tr from-white to-green-50">
+              <div className="inline-flex items-center justify-center rounded-full bg-green-100 h-20 w-20 mb-6">
+                <img
+                  src={hospitalIcon}
+                  alt="Hospital Locator"
+                  className="h-12 w-12"
+                />
+              </div>
+              <h3 className="text-2xl font-semibold text-gray-900 mb-2">
+                Hospital Locator
+              </h3>
+              <p className="text-gray-700 mb-6 text-center max-w-xs">
+                Quickly find nearest hospitals and get direct contact details.
+              </p>
+              <ul className="mb-8 space-y-3 w-full text-gray-700 text-sm">
+                <li className="flex items-center gap-3">
+                  <MapPin className="h-5 w-5 text-green-600" /> Nearby hospitals
+                  & clinics
+                </li>
+                <li className="flex items-center gap-3">
+                  <Phone className="h-5 w-5 text-emerald-600" /> Direct contact
+                  information
+                </li>
+                <li className="flex items-center gap-3">
+                  <Clock className="h-5 w-5 text-lime-600" /> Real-time
+                  availability
+                </li>
+              </ul>
+              <Link to="/hospitals" className="w-full">
+                <button
+                  type="button"
+                  className="w-full py-3 text-lg font-semibold text-white bg-green-700 rounded-lg transition-transform duration-500   hover:bg-green-600"
+                >
+                  Find Hospitals
+                </button>
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
-
-       <section className="py-20 bg-background">
-        <div className="container mx-auto px-4">
-          <Card className="max-w-5xl mx-auto border-2 border-medical/30 shadow-card">
-            <CardHeader className="text-center">
-              <FileText className="h-12 w-12 text-medical mx-auto mb-4" />
-              <CardTitle className="text-3xl">Create Your Medical Profile</CardTitle>
-              <CardDescription className="text-lg">
+      <section className="py-20 bg-background">
+        <div className="container mx-auto px-6">
+          <Card className="max-w-5xl mx-auto border-2 border-medical/20 bg-white/30 backdrop-blur-md rounded-2xl shadow-lg transition-shadow duration-300 hover:shadow-xl hover:bg-white/40">
+            <CardHeader className="text-center px-8 pt-12">
+              <FileText className="h-14 w-14 text-medical mx-auto mb-5" />
+              <CardTitle className="text-4xl font-extrabold text-gray-900">
+                Create Your Medical Profile
+              </CardTitle>
+              <CardDescription className="text-lg text-gray-700 max-w-lg mx-auto mt-2">
                 Store vital medical information for faster emergency response
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
-                <div className="p-4 bg-muted rounded-lg">
-                  <Shield className="h-8 w-8 text-medical mx-auto mb-2" />
-                  <h3 className="font-semibold mb-1">Blood Group</h3>
-                  <p className="text-sm text-muted-foreground">Critical in emergencies</p>
+
+            <CardContent className="space-y-8 px-10 py-12">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+                <div className="flex hover:scale-105 duration-700 transition-all flex-col items-center bg-muted rounded-xl py-8 px-6 shadow-sm  hover:bg-muted/80">
+                  <div className="h-16 w-16 rounded-full bg-medical/20 flex items-center justify-center mb-4">
+                    <Shield className="h-9 w-9 text-medical" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2 text-gray-900">
+                    Blood Group
+                  </h3>
+                  <p className="text-muted-foreground text-sm max-w-xs">
+                    Critical in emergencies
+                  </p>
                 </div>
-                <div className="p-4 bg-muted rounded-lg">
-                  <Heart className="h-8 w-8 text-emergency mx-auto mb-2" />
-                  <h3 className="font-semibold mb-1">Allergies</h3>
-                  <p className="text-sm text-muted-foreground">Prevent complications</p>
+                <div className="flex hover:scale-105 duration-700 transition-all flex-col items-center bg-muted rounded-xl py-8 px-6 shadow-sm  hover:bg-muted/80">
+                  <div className="h-16 w-16 rounded-full bg-emergency/20 flex items-center justify-center mb-4">
+                    <Heart className="h-9 w-9 text-emergency" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2 text-gray-900">
+                    Allergies
+                  </h3>
+                  <p className="text-muted-foreground text-sm max-w-xs">
+                    Prevent complications
+                  </p>
                 </div>
-                <div className="p-4 bg-muted rounded-lg">
-                  <FileText className="h-8 w-8 text-success mx-auto mb-2" />
-                  <h3 className="font-semibold mb-1">Conditions</h3>
-                  <p className="text-sm text-muted-foreground">Medical history</p>
+                <div className="flex flex-col items-center bg-muted rounded-xl py-8 px-6 shadow-sm hover:scale-105 duration-700 transition-all hover:bg-muted/80">
+                  <div className="h-16 w-16 rounded-full bg-success/20 flex items-center justify-center mb-4">
+                    <FileText className="h-9 w-9 text-success" />
+                  </div>
+                  <h3 className="text-xl font-semibold mb-2 text-gray-900">
+                    Conditions
+                  </h3>
+                  <p className="text-muted-foreground text-sm max-w-xs">
+                    Medical history
+                  </p>
                 </div>
               </div>
-              <div className="text-center pt-4">
+
+              <div className="text-center">
                 <Link to="/profile">
-                  <Button variant="medical" size="lg">
+                  <Button
+                    variant="medical"
+                    size="lg"
+                    className="bg-gradient-to-r from-medical text-white to-medical/70 hover:from-medical/80 hover:to-medical/80 shadow-lg shadow-medical/50"
+                  >
                     Set Up Profile
                   </Button>
                 </Link>
@@ -241,30 +295,141 @@ const Home = () => {
         </div>
       </section>
 
-         <section className="py-16 bg-gradient-hero">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto text-center">
-            <div>
-              <div className="text-4xl md:text-5xl font-bold text-white mb-2">24/7</div>
-              <div className="text-white/80">Available</div>
-            </div>
-            <div>
-              <div className="text-4xl md:text-5xl font-bold text-white mb-2">&lt;30s</div>
-              <div className="text-white/80">Response Time</div>
-            </div>
-            <div>
-              <div className="text-4xl md:text-5xl font-bold text-white mb-2">100+</div>
-              <div className="text-white/80">First-Aid Guides</div>
-            </div>
-            <div>
-              <div className="text-4xl md:text-5xl font-bold text-white mb-2">1000+</div>
-              <div className="text-white/80">Hospitals Listed</div>
-            </div>
+      <section className="py-5  bg-cyan-950/5 to-slate-100">
+        <div className="container mx-auto px-6 max-w-6xl">
+          {/* Header */}
+          <div className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-slate-700">
+              Our Impact at a Glance
+            </h2>
+            <p className="text-slate-500 mt-2 max-w-2xl mx-auto">
+              Quick stats showing how we help people with instant guidance and
+              reliable information.
+            </p>
+          </div>
+
+          {/* Stats grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Card template */}
+            {[
+              {
+                value: "24/7",
+                label: "Available",
+                iconBg: "bg-indigo-50",
+                icon: (
+                  <svg
+                    className="h-6 w-6 text-indigo-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle cx="12" cy="12" r="9" strokeWidth="1.5" />
+                    <path
+                      d="M12 7v6l4 2"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                ),
+              },
+              {
+                value: "<30s",
+                label: "Response Time",
+                iconBg: "bg-rose-50",
+                icon: (
+                  <svg
+                    className="h-6 w-6 text-rose-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle cx="12" cy="12" r="9" strokeWidth="1.5" />
+                    <path
+                      d="M12 8v5l3 2"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                ),
+              },
+              {
+                value: "100+",
+                label: "First-Aid Guides",
+                iconBg: "bg-emerald-50",
+                icon: (
+                  <svg
+                    className="h-6 w-6 text-emerald-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <rect
+                      x="3"
+                      y="3"
+                      width="18"
+                      height="18"
+                      rx="2"
+                      strokeWidth="1.5"
+                    />
+                    <path
+                      d="M9 12h6M12 15v-6"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                ),
+              },
+              {
+                value: "1000+",
+                label: "Hospitals Listed",
+                iconBg: "bg-sky-50",
+                icon: (
+                  <svg
+                    className="h-6 w-6 text-sky-600"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M3 21h18" strokeWidth="1.5" />
+                    <path d="M7 3v18" strokeWidth="1.5" />
+                    <path d="M17 3v18" strokeWidth="1.5" />
+                  </svg>
+                ),
+              },
+            ].map((item) => (
+              <div
+                key={item.label}
+                className="flex items-center gap-4 p-5 rounded-xl bg-white shadow-sm border border-slate-100 hover:shadow-md transition-shadow duration-200"
+              >
+                <div
+                  className={`flex-shrink-0 h-14 w-14 rounded-lg flex items-center justify-center ${item.iconBg}`}
+                >
+                  {item.icon}
+                </div>
+
+                <div className="text-left">
+                  <div className="text-2xl md:text-3xl font-extrabold text-slate-900 leading-tight">
+                    {item.value}
+                  </div>
+                  <div className="text-sm text-slate-500 font-medium mt-1">
+                    {item.label}
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
 
-
+      <section className="bg-blue-700 flex justify-center items-center p-5 text-white">
+        <p className="text-center text-sm">
+          © 2025 Emergency Aid. All rights reserved. Stay safe and seek help
+          when needed. Your health matters to us.
+        </p>
+      </section>
     </div>
   );
 };

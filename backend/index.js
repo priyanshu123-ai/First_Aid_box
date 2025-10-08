@@ -35,7 +35,7 @@ app.use("/api/v2",ImageRouter);
 
 app.use("/api/v3",userProfileRoute)
 
-app.use("api/v4",LocationRoute)
+app.use("/api/v4",LocationRoute)
 
 app.listen(port,() => {
     console.log(`Server is Running at Port NO ${port}`);

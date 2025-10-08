@@ -9,6 +9,8 @@ const ContactDetailSchema= new mongoose.Schema({
         type:String,
         required:true
     },
+
+  
     relation:{
         type:String,
         

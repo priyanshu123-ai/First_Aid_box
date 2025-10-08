@@ -1,64 +1,79 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import axios from "axios";
-import { AlertCircle, MapPin, Phone, Mail, MessageSquare, Check } from "lucide-react";
-import { useState } from "react";
+import {
+  AlertCircle,
+  MapPin,
+  Phone,
+  Check,
+} from "lucide-react";
+import { useState, useContext } from "react";
 import { toast } from "react-toastify";
-import Navbar from "./Navbar";
+
 import CardDetails from "./CardDetails";
 import LiveMap from "./LiveMap";
+import { EmergencyContext } from "@/context/EmergecyCon";
 
 const Emergency = () => {
   const [sosActive, setSosActive] = useState(false);
   const [location, setLocation] = useState(null);
   const [alertsSent, setAlertsSent] = useState([]);
   const [nearestHospitals, setNearestHospitals] = useState([]);
+  const { detail } = useContext(EmergencyContext); // ✅ useContext at top level
 
-  const handleSOS = () => {
+  const handleSOS = async () => {
     setSosActive(true);
-    handleGetLocation();
-  };
 
-  const handleGetLocation = async () => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const coords = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude,
-          };
-
-          setLocation(coords);
-          toast.success("✅ Location fetched successfully!");
-
-          try {
-            const response = await axios.get("http://localhost:4000/api/v4/location", {
-              params: { lat: coords.lat, lng: coords.lng },
-            });
-
-            console.log("Backend response:", response.data);
-
-            if (response.data.data && response.data.data.length > 0) {
-              setNearestHospitals(response.data.data); // store all hospitals
-            }
-
-            setAlertsSent(["SMS", "Email", "WhatsApp"]);
-            toast.success("📍 Location & nearest hospitals sent to backend!");
-          } catch (error) {
-            console.error(error);
-            toast.error("❌ Failed to send location to backend");
-          }
-        },
-        (error) => {
-          toast.error("❌ Unable to get location");
-          console.error(error);
-          setSosActive(false);
-        }
-      );
-    } else {
+    if (!navigator.geolocation) {
       toast.error("❌ Geolocation not supported by this browser");
       setSosActive(false);
+      return;
     }
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const coords = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude,
+        };
+        setLocation(coords);
+        toast.success("✅ Location fetched successfully!");
+
+        try {
+          // Fetch nearest hospitals
+          const response = await axios.get(
+            "http://localhost:4000/api/v4/location",
+            { params: { lat: coords.lat, lng: coords.lng } }
+          );
+
+          console.log("Backend response:", response.data);
+
+          if (response.data.data && response.data.data.length > 0) {
+            setNearestHospitals(response.data.data);
+          }
+
+          // Now send SOS email
+          await handleEmergency(coords);
+
+          setAlertsSent(["SMS", "Email", "WhatsApp"]);
+          toast.success("📍 SOS alert and location sent successfully!");
+        } catch (error) {
+          console.error(error);
+          toast.error("❌ Failed to send location or SOS alert");
+        }
+      },
+      (error) => {
+        toast.error("❌ Unable to get location");
+        console.error(error);
+        setSosActive(false);
+      }
+    );
   };
 
   const handleCancel = () => {
@@ -69,9 +84,36 @@ const Emergency = () => {
     toast.info("Emergency alert cancelled");
   };
 
+ const handleEmergency = async (coords) => {
+  try {
+    if (!detail || !detail.email) {
+      toast.error("No email found in profile details");
+      return;
+    }
+
+    await axios.post("http://localhost:4000/api/v4/mail", {
+      email: detail.email,
+      
+      name: detail.FullName,
+      relation: detail.contactDetails?.[0]?.relation || "",
+      phoneNumber: detail.contactDetails?.[0]?.phoneNumber || "",
+      location: coords,
+
+      
+    });
+
+    console.log(detail.email,detail.relation,detail.phoneNumber)
+
+    toast.success("🚨 SOS alert sent to your registered email!");
+  } catch (error) {
+    console.error(error);
+    toast.error("❌ Failed to send SOS alert");
+  }
+};
+
+
   return (
     <div className="min-h-screen bg-gradient-subtle">
-      <Navbar />
       <div className="container mx-auto px-4 py-12 max-w-4xl">
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">Emergency SOS</h1>
@@ -86,15 +128,18 @@ const Emergency = () => {
               <div className="text-center space-y-6">
                 <AlertCircle className="h-24 w-24 text-emergency mx-auto emergency-pulse" />
                 <div>
-                  <h2 className="text-2xl font-bold mb-2">Press in Case of Emergency</h2>
+                  <h2 className="text-2xl font-bold mb-2">
+                    Press in Case of Emergency
+                  </h2>
                   <p className="text-muted-foreground">
-                    This will immediately alert all your emergency contacts with your current location
+                    This will immediately alert all your emergency contacts with
+                    your current location
                   </p>
                 </div>
                 <Button
                   variant="emergency"
                   size="xl"
-                  onClick={handleSOS}
+                  onClick={handleSOS} // ✅ only one function now
                   className="w-full bg-emergency px-4 py-6 text-white max-w-sm mx-auto text-lg font-bold shadow-glow emergency-pulse"
                 >
                   <AlertCircle className="h-8 w-8" />
@@ -115,27 +160,26 @@ const Emergency = () => {
                     </div>
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-emergency mb-2">EMERGENCY ALERT ACTIVE</h2>
-                    <p className="text-muted-foreground">Your emergency contacts are being notified</p>
+                    <h2 className="text-2xl font-bold text-emergency mb-2">
+                      EMERGENCY ALERT ACTIVE
+                    </h2>
+                    <p className="text-muted-foreground">
+                      Your emergency contacts are being notified
+                    </p>
                   </div>
 
-                 {location && (
-  <>
-    <div className="p-4 bg-background rounded-lg max-w-md mx-auto">
-      <div className="flex items-center gap-2 justify-center mb-2">
-        <MapPin className="h-5 w-5 text-emergency" />
-        <span className="font-semibold">Current Location</span>
-      </div>
-      <p className="text-sm text-muted-foreground">
-        Lat: {location.lat.toFixed(6)}, Lng: {location.lng.toFixed(6)}
-      </p>
-    </div>
-
-    {/* Live map */}
-   
-  </>
-)}
-
+                  {location && (
+                    <div className="p-4 bg-background rounded-lg max-w-md mx-auto">
+                      <div className="flex items-center gap-2 justify-center mb-2">
+                        <MapPin className="h-5 w-5 text-emergency" />
+                        <span className="font-semibold">Current Location</span>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Lat: {location.lat.toFixed(6)}, Lng:{" "}
+                        {location.lng.toFixed(6)}
+                      </p>
+                    </div>
+                  )}
 
                   <div className="space-y-3 max-w-md mx-auto">
                     {["SMS", "Email", "WhatsApp"].map((method) => (
@@ -147,16 +191,25 @@ const Emergency = () => {
                             : "bg-muted border border-transparent"
                         }`}
                       >
-                        {alertsSent.includes(method) && <Check className="h-5 w-5 text-success" />}
+                        {alertsSent.includes(method) && (
+                          <Check className="h-5 w-5 text-success" />
+                        )}
                         <span className="font-medium">{method} Alert</span>
                         <span className="ml-auto text-sm">
-                          {alertsSent.includes(method) ? "Sent" : "Sending..."}
+                          {alertsSent.includes(method)
+                            ? "Sent"
+                            : "Sending..."}
                         </span>
                       </div>
                     ))}
                   </div>
 
-                  <Button variant="outline" size="lg" onClick={handleCancel} className="mt-6">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    onClick={handleCancel}
+                    className="mt-6"
+                  >
                     Cancel Alert
                   </Button>
                 </div>
@@ -168,14 +221,21 @@ const Emergency = () => {
               <Card className="mb-8 shadow-card">
                 <CardHeader>
                   <CardTitle>Nearest Hospitals</CardTitle>
-                  <CardDescription>Top 5 nearest hospitals from your location</CardDescription>
+                  <CardDescription>
+                    Top 5 nearest hospitals from your location
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {nearestHospitals.map((hospital, index) => (
-                    <div key={index} className="p-4 bg-muted rounded-lg flex justify-between items-center">
+                    <div
+                      key={index}
+                      className="p-4 bg-muted rounded-lg flex justify-between items-center"
+                    >
                       <div>
                         <h4 className="font-semibold">{hospital.name}</h4>
-                        <p className="text-sm text-muted-foreground">{hospital.address}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {hospital.address}
+                        </p>
                         <p className="text-sm text-muted-foreground">
                           Distance: {hospital.distance.toFixed(2)} km
                         </p>
@@ -192,13 +252,12 @@ const Emergency = () => {
           </>
         )}
       </div>
-     <div>
-    {!sosActive && <CardDetails />}
 
-    
-  </div>
-  {location &&  <LiveMap location={location} />}
+      <div>{!sosActive && <CardDetails />}</div>
 
+      <div className="px-52 mb-10">
+        {location && <LiveMap location={location} />}
+      </div>
     </div>
   );
 };

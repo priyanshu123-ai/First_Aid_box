@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 
-import Navbar from "./Navbar";
+
 import {
   Card,
   CardContent,
@@ -33,6 +33,7 @@ import {
   Plus,
   Trash2,
 } from "lucide-react";
+import { EmergencyContext } from "@/context/EmergecyCon";
 
 const Profile = () => {
   const [form, setForm] = useState({
@@ -54,6 +55,8 @@ const Profile = () => {
   const [emergencyContacts, setEmergencyContacts] = useState([
     { id: Date.now(), name: "", phoneNumber: "", relation: "" },
   ]);
+
+  const {setDetail,detail} = useContext(EmergencyContext)
 
   // handle normal inputs
   const handleChange = (e) => {
@@ -102,6 +105,9 @@ const Profile = () => {
         { withCredentials: true }
       );
 
+      setDetail(res.data.data)
+      console.log("Detail",detail)
+
       toast.success("Medical profile saved successfully!");
       console.log("Saved:", res.data);
     } catch (err) {
@@ -126,7 +132,7 @@ const Profile = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 py-12">
-      <Navbar />
+   
       <form onSubmit={handleSaveProfile}>
         <div className="container mx-auto px-4 max-w-4xl">
           {/* Header */}
