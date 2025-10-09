@@ -411,7 +411,7 @@ const Home = () => {
                 </div>
 
                 <div className="text-left">
-                  <div className="text-2xl md:text-3xl font-extrabold text-slate-900 leading-tight">
+                  <div className="text-2xl md:text-2xl font-extrabold text-slate-900 leading-tight">
                     {item.value}
                   </div>
                   <div className="text-sm text-slate-500 font-medium mt-1">

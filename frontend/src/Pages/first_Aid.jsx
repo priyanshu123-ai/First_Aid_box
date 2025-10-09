@@ -98,7 +98,9 @@ const FirstAid = () => {
 
     window.speechSynthesis.speak(utterance);
     toast.success(
-      `Speaking in ${selectedLang} using ${selectedVoice?.name || "default voice"}`
+      `Speaking in ${selectedLang} using ${
+        selectedVoice?.name || "default voice"
+      }`
     );
   };
 
@@ -244,9 +246,12 @@ const FirstAid = () => {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8 px-4">
-          <h1 className="text-3xl md:text-5xl font-bold mb-2">First-Aid Guide</h1>
+          <h1 className="text-3xl md:text-5xl font-bold mb-2">
+            First-Aid Guide
+          </h1>
           <p className="text-sm md:text-lg text-muted-foreground max-w-2xl mx-auto">
-            Step-by-step emergency instructions with multilingual voice guidance.
+            Step-by-step emergency instructions with multilingual voice
+            guidance.
           </p>
         </div>
 
@@ -336,7 +341,9 @@ const FirstAid = () => {
 
                     {/* Image Upload */}
                     <div className="bg-muted p-4 rounded-lg flex flex-col gap-4">
-                      <h3 className="font-semibold text-lg">Generate Video from Image</h3>
+                      <h3 className="font-semibold text-lg">
+                        Generate Video from Image
+                      </h3>
                       <input
                         type="file"
                         accept="image/*"
@@ -359,7 +366,9 @@ const FirstAid = () => {
 
                     {/* Query Video */}
                     <div className="bg-muted p-4 rounded-lg flex flex-col gap-4">
-                      <h3 className="font-semibold text-lg">Generate Video from Query</h3>
+                      <h3 className="font-semibold text-lg">
+                        Generate Video from Query
+                      </h3>
                       <div className="flex flex-col sm:flex-row gap-2">
                         <input
                           type="text"
@@ -397,7 +406,9 @@ const FirstAid = () => {
                   {/* Steps */}
                   <CardContent className="space-y-6">
                     <div>
-                      <h4 className="font-semibold mb-3">Step-by-Step Instructions</h4>
+                      <h4 className="font-semibold mb-3">
+                        Step-by-Step Instructions
+                      </h4>
                       <div className="space-y-4">
                         {guide.steps.map((step, index) => (
                           <div
@@ -407,7 +418,9 @@ const FirstAid = () => {
                             <div className="shrink-0 w-8 h-8 rounded-full bg-emergency text-emergency-foreground flex items-center justify-center font-bold">
                               {index + 1}
                             </div>
-                            <p className="text-sm leading-relaxed pt-1">{step}</p>
+                            <p className="text-sm leading-relaxed pt-1">
+                              {step}
+                            </p>
                           </div>
                         ))}
                       </div>
