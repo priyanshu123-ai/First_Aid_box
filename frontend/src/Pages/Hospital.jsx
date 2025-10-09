@@ -7,6 +7,10 @@ import { toast } from "react-toastify";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 
+
+
+//hospitals
+
 // User marker (blue dot)
 const userIcon = new L.Icon({
   iconUrl:
