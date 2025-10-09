@@ -100,7 +100,7 @@ const Register = () => {
 
   return (
    <div>
-    <Navbar />
+   
 
      <div className="flex justify-center items-center  py-12 px-4">
     

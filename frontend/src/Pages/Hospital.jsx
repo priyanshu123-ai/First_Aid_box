@@ -2,12 +2,16 @@
 
 import React, { useState } from "react";
 import axios from "axios";
-import { MapPin, Navigation, Phone } from "lucide-react";
+import { MapPin, Navigation, Phone, Star } from "lucide-react";
 import { toast } from "react-toastify";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from "leaflet";
 
-// Custom blue icon for user's location
+
+
+//hospitals
+
+// User marker (blue dot)
 const userIcon = new L.Icon({
   iconUrl:
     "https://maps.gstatic.com/intl/en_us/mapfiles/markers2/measle_blue.png",
@@ -15,7 +19,7 @@ const userIcon = new L.Icon({
   iconAnchor: [7, 7],
 });
 
-// Red marker for hospitals
+// Hospital marker (red pin)
 const hospitalIcon = new L.Icon({
   iconUrl: "https://maps.gstatic.com/intl/en_us/mapfiles/markers2/marker.png",
   iconSize: [25, 41],
@@ -51,19 +55,14 @@ function Hospital() {
               params: { lat: coords.lat, lng: coords.lng },
             }
           );
-          
 
-          console.log("here is response of hospitals location",response);
-          
+          console.log("Hospitals response:", response);
 
           if (response.data?.data?.length) {
             setNearestHospitals(response.data.data);
           } else {
             toast.info("No hospitals found nearby");
           }
-
-          // console.log("here is nearsthospitals",nearestHospitals);
-          
         } catch (err) {
           console.error(err);
           toast.error("❌ Failed to fetch nearby hospitals");
@@ -72,9 +71,11 @@ function Hospital() {
         }
       },
       (error) => {
+        console.warn(error);
         setLoading(false);
-        console.error(error);
-        toast.error("❌ Unable to get your location");
+        toast.warning("⚠️ Location access denied, showing default area...");
+        // fallback default city (Bangalore)
+        setUserLocation({ lat: 12.9716, lng: 77.5946 });
       }
     );
   };
@@ -83,30 +84,32 @@ function Hospital() {
     <div className="min-h-screen bg-gray-50 py-10 px-4">
       {/* Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold">🏥 Nearby Hospitals</h1>
+        <h1 className=" text-lg md:text-3xl font-bold">🏥 Nearby Hospitals</h1>
         <p className="text-gray-500">
           Click below to find hospitals closest to your current location.
         </p>
       </div>
 
       {/* Button */}
-      <div className="max-w-4xl mx-auto text-center mb-6">
+      <div className="max-w-4xl mx-auto text-center mb-8">
         <button
           onClick={handleGetLocation}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-3 rounded-xl font-medium shadow-md"
+          className={`transition-all duration-300 ${
+            loading ? "bg-blue-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
+          } text-white px-6 py-3 rounded-lg font-medium shadow-md text-base sm:text-lg`}
           disabled={loading}
         >
           {loading ? "Fetching..." : "📍 Use My Location"}
         </button>
       </div>
 
-   
-      {userLocation && (
-        <div className="w-full  mb-10 rounded-xl overflow-hidden  shadow">
+      {/* Map Section */}
+      <div className="max-w-6xl mx-auto mb-10 bg-white rounded-2xl shadow p-4">
+        {userLocation ? (
           <MapContainer
             center={[userLocation.lat, userLocation.lng]}
             zoom={13}
-            style={{ height: "400px", width: "100%" }}
+            style={{ height: "400px", width: "100%", borderRadius: "12px" }}
           >
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -153,46 +156,60 @@ function Hospital() {
               </Marker>
             ))}
           </MapContainer>
-        </div>
-      )}
+        ) : (
+          <div className="flex flex-col items-center justify-center py-24 text-gray-500">
+            <MapPin className="w-10 h-10 mb-3 text-blue-500" />
+            <h2 className="text-lg font-semibold">Interactive Map</h2>
+            <p>Map view will show hospital locations once you share your location.</p>
+          </div>
+        )}
+      </div>
 
-      {/* 🏥 List Section */}
+      {/* 🏥 Hospitals List */}
       {nearestHospitals.length > 0 && (
-        <div className="max-w-4xl mx-auto bg-white p-6 rounded-2xl shadow">
-          <h2 className="text-xl font-semibold mb-4 text-left">
-            Nearest Hospitals
-          </h2>
-          <div className="space-y-4">
+        <div className="max-w-6xl mx-auto bg-white p-6 rounded-2xl shadow">
+          <h2 className="text-2xl font-semibold mb-4">🏥 Nearest Hospitals</h2>
+          <p className="text-gray-500 mb-6">
+            Found {nearestHospitals.length} medical facilities near you
+          </p>
+          <div className="space-y-5">
             {nearestHospitals.map((hospital, index) => (
               <div
                 key={index}
-                className="border border-gray-200 p-4 rounded-xl flex flex-col sm:flex-row sm:justify-between sm:items-center hover:shadow-md transition"
+                className="border border-gray-200 p-5 rounded-xl flex flex-col sm:flex-row sm:justify-between sm:items-center hover:shadow-lg transition"
               >
                 <div>
-                  <h3 className="font-semibold text-lg">{hospital.name}</h3>
-                  <p className="text-gray-500 text-sm flex items-center gap-1">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-bold text-lg">{hospital.name}</h3>
+                    <span className="bg-red-100 text-red-600 text-xs font-semibold px-2 py-1 rounded">
+                      24/7 Emergency
+                    </span>
+                  </div>
+                  <p className="text-gray-500 text-sm flex items-center gap-1 mt-1">
                     <MapPin className="w-4 h-4" /> {hospital.address}
                   </p>
-                  <p className="text-sm text-gray-600 mt-1">
-                    Distance: {hospital.distance.toFixed(2)} km
+                  <div className="flex items-center gap-1 mt-1 text-yellow-500 text-sm">
+                    <Star className="w-4 h-4" /> {hospital.rating || "4.5"} ★
+                  </div>
+                  <p className="text-gray-600 text-sm mt-1">
+                    Distance: {hospital.distance?.toFixed(2) || "—"} km away
                   </p>
                 </div>
 
-                <div className="flex gap-3 mt-3 sm:mt-0">
+                <div className="flex flex-wrap gap-3 mt-3 sm:mt-0">
+                  <a
+                    href={`tel:${hospital.phone}`}
+                    className="inline-flex items-center gap-2 bg-red-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-red-700 transition"
+                  >
+                    <Phone className="w-4 h-4" /> Call Now
+                  </a>
                   <a
                     href={`https://www.google.com/maps/dir/?api=1&destination=${hospital.lat},${hospital.lon}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 bg-blue-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-blue-700 transition"
                   >
-                    <Navigation className="w-4 h-4" /> Directions
-                  </a>
-
-                  <a
-                    href={`tel:${hospital.phone || ""}`}
-                    className="inline-flex items-center gap-2 bg-green-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-green-700 transition"
-                  >
-                    <Phone className="w-4 h-4" /> Call
+                    <Navigation className="w-4 h-4" /> Get Directions
                   </a>
                 </div>
               </div>
@@ -201,12 +218,17 @@ function Hospital() {
         </div>
       )}
 
-      {!loading && nearestHospitals.length === 0 && (
-        <div className="text-center text-gray-500 mt-10">
-          No hospitals to show yet. Click the button above to find nearby
-          hospitals.
+      {/* Compact Emergency Footer */}
+      <div className="max-w-6xl mx-auto mt-10 bg-gradient-to-r from-red-600 to-blue-600 text-white p-4 rounded-xl shadow-md flex flex-col sm:flex-row justify-between items-center text-sm">
+        <div className="flex items-center gap-2">
+          <span className="font-semibold text-lg">🚨 Emergency:</span>
+          <span className="font-bold text-xl">911</span>
         </div>
-      )}
+        <div className="flex items-center gap-2 mt-2 sm:mt-0">
+          <span>Poison Control:</span>
+          <span className="font-semibold underline">1-800-222-1222</span>
+        </div>
+      </div>
     </div>
   );
 }

@@ -8,13 +8,17 @@ import Profile from './Pages/Profile'
 import Emergency from './Pages/Emergency'
 import Navbar from './Pages/Navbar'
 import  Hospital  from './Pages/Hospital'
+import EmergencyChatbot from './Pages/ChatBot'
+import HeartMonitor from './Pages/HeartRate'
 
 
 const App = () => {
   return (
     <div>
       <Navbar />
+      <EmergencyChatbot />
       <Routes>
+        
         <Route path='/' element={<Home />}/>
         <Route path='/register' element = {<Register />}/>
         <Route path='/login' element = {<Login />}/>
@@ -22,6 +26,7 @@ const App = () => {
         <Route path='/emergency' element={<Emergency />}/>
         <Route path='/profile' element={<Profile />} />
         <Route path='/hospitals' element={<Hospital />} />
+        <Route path='/heart' element={<HeartMonitor />}/>
       </Routes>
       
     </div>

@@ -6,7 +6,7 @@ export const AuthContext = createContext();
 function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
 
-  // ✅ Get current user
+
   const getStatus = async () => {
     try {
       const resp = await axios.get("http://localhost:4000/api/v1/current", {
@@ -19,7 +19,7 @@ function AuthProvider({ children }) {
     }
   };
 
-  // ✅ Logout
+ 
   const logout = async () => {
     try {
       await axios.post("http://localhost:4000/api/v1/logout", {}, { withCredentials: true });

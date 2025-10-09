@@ -1,24 +1,13 @@
 // -------------------- IMPORTS --------------------
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Flame,
-  Bone,
-  AlertTriangle,
-  Volume2,
-  Camera,
-  Video,
-  X,
-} from "lucide-react";
+import { Flame, Heart, Bone, AlertTriangle, Volume2, Camera, Video, X } from "lucide-react";
 import { useEffect, useState, useRef } from "react";
 import { toast } from "react-toastify";
+
+import VideoCall from "./VideoCall";
+import {  useNavigate } from "react-router-dom";
 
 // -------------------- COMPONENT --------------------
 const FirstAid = () => {
@@ -27,9 +16,12 @@ const FirstAid = () => {
   const [selectedLang, setSelectedLang] = useState("en-IN");
   const [selectedVoice, setSelectedVoice] = useState(null);
 
+  const navigate = useNavigate()
+
   const [capturedMedia, setCapturedMedia] = useState({});
   const fileInputRef = useRef(null);
   const [selectedImage, setSelectedImage] = useState(null);
+  const [isVideoCallOpen, setIsVideoCallOpen] = useState(false);
 
   const [userQuery, setUserQuery] = useState("");
   const [generatedVideo, setGeneratedVideo] = useState(null);
@@ -114,7 +106,7 @@ const FirstAid = () => {
     v.lang.startsWith(selectedLang.split("-")[0])
   );
 
-  // -------------------- PHOTO CAPTURE + VIDEO GENERATION --------------------
+ 
   const handleGenerateVideo = async () => {
     if (!userQuery) return toast.error("Please enter a query");
 
@@ -169,46 +161,84 @@ const FirstAid = () => {
 
   const firstAidGuides = [
     {
-      id: "burns",
-      title: "Burns",
-      icon: Flame,
-      color: "text-orange-500",
+      id: "cpr",
+      title: "CPR & Heart Attack",
+      icon: Heart,
+      color: "text-emergency",
+      videoUrl: "https://www.youtube.com/embed/zF_36GYLcMM",
       steps: [
-        "Cool the burn under running water for at least 10 minutes.",
-        "Remove tight clothing or jewelry near the burn area.",
-        "Cover the burn with a clean, non-fluffy cloth or cling film.",
-        "Do not apply creams, oils, or ice.",
-        "Seek medical attention if the burn is severe or large.",
-      ],
+        "Call emergency services immediately (911 or local emergency number)",
+        "Check if the person is responsive and breathing",
+        "Place the person on their back on a firm surface",
+        "Place the heel of one hand on the center of the chest",
+        "Place your other hand on top and interlock fingers",
+        "Push hard and fast - at least 2 inches deep",
+        "Perform 30 chest compressions at 100-120 per minute",
+        "Give 2 rescue breaths if trained",
+        "Continue until help arrives or person starts breathing"
+      ]
+    },
+    {
+      id: "burns",
+      title: "Burns Treatment",
+      icon: Flame,
+      color: "text-warning",
+      videoUrl: "https://www.youtube.com/embed/CYfPd5ELHyU",
+      steps: [
+        "Remove the person from the heat source immediately",
+        "Cool the burn under running water for 10-20 minutes",
+        "Remove jewelry or tight clothing before swelling starts",
+        "Cover the burn with a clean, dry cloth or sterile bandage",
+        "Do NOT apply ice, butter, or ointments",
+        "Do NOT break any blisters",
+        "For severe burns, seek immediate medical attention",
+        "Keep the person warm with a blanket (avoid burned areas)",
+        "Monitor for signs of shock"
+      ]
     },
     {
       id: "fractures",
-      title: "Fractures",
+      title: "Fractures & Injuries",
       icon: Bone,
-      color: "text-blue-500",
+      color: "text-medical",
+      videoUrl: "https://www.youtube.com/embed/L7z7BgZfhJM",
       steps: [
-        "Keep the injured limb still and supported.",
-        "Apply a splint or padding if trained.",
-        "Control any bleeding with a clean cloth.",
-        "Do not try to push the bone back in place.",
-        "Seek medical help immediately.",
-      ],
+        "Call emergency services for severe fractures",
+        "Do NOT try to realign the bone",
+        "Immobilize the injured area",
+        "Apply ice packs to reduce swelling (20 minutes on, 20 off)",
+        "Use padding to support the injured area",
+        "Create a splint using firm materials if needed",
+        "Elevate the injured limb above heart level if possible",
+        "Monitor circulation - check for numbness or color changes",
+        "Keep the person still and comfortable until help arrives"
+      ]
     },
     {
-      id: "bleeding",
-      title: "Severe Bleeding",
+      id: "choking",
+      title: "Choking Response",
       icon: AlertTriangle,
-      color: "text-red-500",
+      color: "text-destructive",
+      videoUrl: "https://www.youtube.com/embed/7CgtIgSyAiU",
       steps: [
-        "Apply direct pressure to the wound with a clean cloth.",
-        "Raise the injured area above the heart if possible.",
-        "Do not remove objects stuck in the wound.",
-        "Keep applying pressure until help arrives.",
-      ],
-    },
+        "Ask 'Are you choking?' - if they can't speak, it's serious",
+        "Stand behind the person and wrap arms around their waist",
+        "Make a fist with one hand above the navel",
+        "Grasp the fist with your other hand",
+        "Give quick, upward thrusts (Heimlich maneuver)",
+        "Repeat until object is dislodged",
+        "For unconscious person, begin CPR",
+        "Call emergency services if choking persists",
+        "Even if successful, seek medical evaluation"
+      ]
+    }
   ];
 
-  // -------------------- UI --------------------
+  if (isVideoCallOpen) {
+    return <VideoCall onClose={() => setIsVideoCallOpen(false)} />;
+  }
+
+
   return (
     <div className="min-h-screen bg-gradient-subtle py-8 px-4">
       <div className="max-w-7xl mx-auto">
@@ -241,32 +271,12 @@ const FirstAid = () => {
             </select>
           </div>
 
-          <div className="flex flex-col">
-            <label className="text-sm font-medium mb-1">Voice</label>
-            <select
-              className="border rounded-lg px-4 py-2 bg-background min-w-[200px]"
-              value={selectedVoice?.name || ""}
-              onChange={(e) => {
-                const voice = voices.find((v) => v.name === e.target.value);
-                setSelectedVoice(voice || null);
-              }}
-            >
-              {availableVoices.length > 0 ? (
-                availableVoices.map((v, i) => (
-                  <option key={i} value={v.name}>
-                    {v.name} ({v.lang})
-                  </option>
-                ))
-              ) : (
-                <option>No voices available</option>
-              )}
-            </select>
-          </div>
+      
         </div>
 
         {/* Tabs */}
         <Tabs defaultValue="burns" className="space-y-6">
-          <TabsList className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2">
+          <TabsList className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2 mb-20">
             {firstAidGuides.map((guide) => {
               const Icon = guide.icon;
               return (
@@ -296,20 +306,32 @@ const FirstAid = () => {
                         </div>
                         <div>
                           <CardTitle className="text-xl sm:text-2xl">{guide.title}</CardTitle>
-                          <CardDescription>
-                            Follow these steps carefully
-                          </CardDescription>
+                          <CardDescription>Follow these steps carefully</CardDescription>
                         </div>
                       </div>
-                      <Button
-                        variant="medical"
-                        size="lg"
-                        onClick={() => handleVoiceGuidance(guide.title, guide.steps)}
-                        disabled={isPlaying}
-                      >
-                        <Volume2 className="h-5 w-5" />
-                        {isPlaying ? "Playing..." : "Voice Guide"}
-                      </Button>
+
+                      {/* Buttons Section */}
+                      <div className="flex gap-5 ">
+                        <Button
+                          variant="medical"
+                          size="lg"
+                          onClick={() => handleVoiceGuidance(guide.title, guide.steps)}
+                          disabled={isPlaying}
+                          className="gap-2 bg-medical py-6 px-6 text-base rounded-md text-white hover:bg-blend-multiply"
+                        >
+                          <Volume2 className="h-5 w-5 " />
+                          {isPlaying ? "Playing..." : "Voice Guide"}
+                        </Button>
+                        <Button
+                          variant="emergency"
+                          size="lg"
+                          onClick={() => setIsVideoCallOpen(true)}
+                          className="bg-emergency py-6 text-white px-4 text-base rounded-md hover:bg-emergency-hover  shadow-emergency/50 transition duration-300 flex items-center justify-center gap-3 emergency-pulse"
+                        >
+                          <Video className="h-5 w-5" />
+                          Video Call
+                        </Button>
+                      </div>
                     </div>
 
                     {/* Image Upload */}
@@ -435,6 +457,8 @@ const FirstAid = () => {
           })}
         </Tabs>
       </div>
+
+      <button onClick={()=> navigate("/heart")}>Heart Rate Pulse Calculate</button>
     </div>
   );
 };
