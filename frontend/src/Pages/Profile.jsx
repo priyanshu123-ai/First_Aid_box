@@ -100,7 +100,7 @@ const Profile = () => {
       };
 
       const res = await axios.post(
-        "http://localhost:4000/api/v3/profile",
+        "https://first-aid-box-2.onrender.com/api/v3/profile",
         payload,
         { withCredentials: true }
       );
