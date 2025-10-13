@@ -21,7 +21,7 @@ app.use(cookieParser())
 
 app.use(
     cors({
-        origin:["https://first-aid-box-3.onrender.com,http://localhost:5173","http://localhost:5174"],
+        origin:["https://first-aid-box-6.onrender.com,http://localhost:5173","http://localhost:5174"],
         credentials: true
 
     })
