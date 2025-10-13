@@ -20,12 +20,16 @@ const port = process.env.PORT || 4000
 app.use(cookieParser())
 
 app.use(
-    cors({
-        origin:["https://first-aid-box-6.onrender.com,http://localhost:5173","http://localhost:5174"],
-        credentials: true
+  cors({
+    origin: [
+      "https://first-aid-box-6.onrender.com",
+      "http://localhost:5173",
+      "http://localhost:5174"
+    ],
+    credentials: true,
+  })
+);
 
-    })
-)
 
 database()
 
