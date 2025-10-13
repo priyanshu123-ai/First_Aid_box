@@ -10,6 +10,7 @@ import Navbar from './Pages/Navbar'
 import  Hospital  from './Pages/Hospital'
 import EmergencyChatbot from './Pages/ChatBot'
 import HeartMonitor from './Pages/HeartRate'
+import HeartRateChecker from './Pages/HeartRate'
 
 
 const App = () => {
@@ -26,7 +27,7 @@ const App = () => {
         <Route path='/emergency' element={<Emergency />}/>
         <Route path='/profile' element={<Profile />} />
         <Route path='/hospitals' element={<Hospital />} />
-        <Route path='/heart' element={<HeartMonitor />}/>
+        <Route path='/heart' element={<HeartRateChecker />}/>
       </Routes>
       
     </div>
