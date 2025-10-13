@@ -37,7 +37,7 @@ const EmergencyChatbot = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:4000/api/v4/message",
+        "https://first-aid-box-2.onrender.com/api/v4/message",
         { message: input },
         { withCredentials: true }
       );
