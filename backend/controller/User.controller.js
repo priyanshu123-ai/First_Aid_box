@@ -1,49 +1,51 @@
+
+
 import { User } from "../model/User.js";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken"
+import jwt from "jsonwebtoken";
+import QRCode from "qrcode"; // ✅ new import
 
 export const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
-      return res.status(401).json({
-        success: false,
-        message: "All fields are required",
-      });
+      return res.status(400).json({ success: false, message: "All fields are required" });
     }
 
     const existUser = await User.findOne({ email });
-
     if (existUser) {
-      return res.status(401).json({
-        success: false,
-        message: "User Already Exist,Please login",
-      });
+      return res.status(400).json({ success: false, message: "User already exists, please login" });
     }
 
-    const hashedpassword = await bcrypt.hash(password, 10);
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = await User.create({
       name,
       email,
-      password: hashedpassword,
+      password: hashedPassword,
     });
 
-    return res.status(200).json({
+    // ✅ Use localhost URL for QR code during development
+    const profileURL = `https://first-aid-box-2.onrender.com/api/v1/${user._id}`;
+    const qrCodeDataURL = await QRCode.toDataURL(profileURL);
+
+    user.qrCode = qrCodeDataURL;
+    await user.save();
+
+    return res.status(201).json({
       success: true,
-      message: "User Created Successfully",
+      message: "User created successfully with QR code",
       user,
+      qrCode: qrCodeDataURL,
     });
   } catch (error) {
     console.log(error);
-
-    return res.status(500).json({
-      success: false,
-      message: error.message,
-    });
+    return res.status(500).json({ success: false, message: error.message });
   }
 };
+
+
 
 export const login = async (req, res) => {
   try {
