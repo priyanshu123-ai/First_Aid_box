@@ -9,7 +9,7 @@ function AuthProvider({ children }) {
 
   const getStatus = async () => {
     try {
-      const resp = await axios.get("http://localhost:4000/api/v1/current", {
+      const resp = await axios.get("https://first-aid-box-2.onrender.com/api/v1/current", {
         withCredentials: true,
       });
       setCurrentUser(resp.data);
