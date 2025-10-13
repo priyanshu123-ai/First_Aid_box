@@ -78,7 +78,7 @@ const Register = () => {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        "https://first-aid-box-2.onrender.com/v1/register",
+        "https://first-aid-box-2.onrender.com/api/v1/register",
         {
           name: signUpName,
           email: signUpEmail,
