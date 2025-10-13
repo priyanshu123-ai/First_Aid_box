@@ -116,7 +116,7 @@ Location: https://www.google.com/maps?q=${coords.lat},${coords.lng}
       return;
     }
 
-    await axios.post("http://localhost:4000/api/v4/mail", {
+    await axios.post("https://first-aid-box-2.onrender.com/api/v4/mail", {
       email: detail.email,
       
       name: detail.FullName,
