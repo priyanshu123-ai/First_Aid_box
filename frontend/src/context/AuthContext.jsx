@@ -22,7 +22,7 @@ function AuthProvider({ children }) {
  
   const logout = async () => {
     try {
-      await axios.post("http://localhost:4000/api/v1/logout", {}, { withCredentials: true });
+      await axios.post("https://first-aid-box-2.onrender.com/api/v1/logout", {}, { withCredentials: true });
       setCurrentUser(null);
     } catch (error) {
       console.log(error);
