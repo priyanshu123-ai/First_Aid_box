@@ -50,7 +50,7 @@ function Hospital() {
 
         try {
           const response = await axios.get(
-            "http://localhost:4000/api/v4/location",
+            "https://first-aid-box-2.onrender.com/api/v4/location",
             {
               params: { lat: coords.lat, lng: coords.lng },
             }
